@@ -1,12 +1,19 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
+import '../pickers/user_image_picker.dart';
+
 class AuthForm extends StatefulWidget {
-  AuthForm(this.submitFn);
+  AuthForm(this.submitFn, this._isLoading);
+
+  bool _isLoading;
 
   final void Function(
     String email,
     String username,
     String password,
+    File imageFile,
     bool isLogin,
     BuildContext ctx,
   ) submitFn;
@@ -24,13 +31,36 @@ class _AuthFormState extends State<AuthForm> {
   String _userName = '';
   String _userPassword = '';
 
+  File _userImageFile;
+
+  void _pickedImage(File image) {
+    _userImageFile = image;
+  }
+
   void _trySubmit() {
     final isValid = _formKey.currentState.validate();
     FocusScope.of(context).unfocus(); // closes soft keyboard
 
+    if (_userImageFile == null && !_isLogin) {
+      Scaffold.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please choose an image'),
+          backgroundColor: Theme.of(context).primaryColor,
+        ),
+      );
+      return;
+    }
+
     if (isValid) {
       _formKey.currentState.save();
-      widget.submitFn(_userEmail, _userName, _userPassword, _isLogin, context,);
+      widget.submitFn(
+        _userEmail.trim(),
+        _userName,
+        _userPassword,
+        _userImageFile,
+        _isLogin,
+        context,
+      );
     }
   }
 
@@ -47,8 +77,12 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  if (!_isLogin) UserImagePicker(_pickedImage),
                   TextFormField(
                     key: ValueKey('email'),
+                    autocorrect: false,
+                    textCapitalization: TextCapitalization.none,
+                    enableSuggestions: false,
                     validator: (value) {
                       if (value.isEmpty || !value.contains('@')) {
                         return 'Place enter a valid email address';
@@ -64,6 +98,9 @@ class _AuthFormState extends State<AuthForm> {
                   if (!_isLogin)
                     TextFormField(
                       key: ValueKey('username'),
+                      autocorrect: false,
+                      textCapitalization: TextCapitalization.none,
+                      enableSuggestions: false,
                       validator: (value) {
                         if (value.isEmpty || value.length < 4) {
                           return 'Place enter at least 4 characters';
@@ -90,21 +127,24 @@ class _AuthFormState extends State<AuthForm> {
                     },
                   ),
                   SizedBox(height: 12),
-                  RaisedButton(
-                    child: Text(_isLogin ? 'Login' : 'Sign up'),
-                    onPressed: _trySubmit,
-                  ),
-                  FlatButton(
-                    textColor: Theme.of(context).primaryColor,
-                    child: Text(_isLogin
-                        ? 'Create new account'
-                        : 'Login to existing account'),
-                    onPressed: () {
-                      setState(() {
-                        _isLogin = !_isLogin;
-                      });
-                    },
-                  ),
+                  widget._isLoading
+                      ? CircularProgressIndicator()
+                      : RaisedButton(
+                          child: Text(_isLogin ? 'Login' : 'Sign up'),
+                          onPressed: _trySubmit,
+                        ),
+                  if (!widget._isLoading)
+                    FlatButton(
+                      textColor: Theme.of(context).primaryColor,
+                      child: Text(_isLogin
+                          ? 'Create new account'
+                          : 'Login to existing account'),
+                      onPressed: () {
+                        setState(() {
+                          _isLogin = !_isLogin;
+                        });
+                      },
+                    ),
                 ],
               ),
             ),

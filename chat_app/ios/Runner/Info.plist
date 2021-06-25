@@ -15,6 +15,12 @@
         	</array>
     	</dict>
 	</array>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Grant access to photo library?</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Grant access?</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Grant access?</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleExecutable</key>
