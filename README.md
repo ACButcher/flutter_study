@@ -7,6 +7,7 @@ Apps in this repository are largely based off code found in Udemy course
   "Flutter & Dart - The Complete Guide [2021 Edition]"
 
 CHANGE HISTORY
+ - 6/25/2021: Updated repository to contain Chat App. Udemy course completed.
  - 6/16/2021: Updated repository to contain most recent iterations of Shop App and Great Places App.
               - Shop App is completed.
               - Great Places supports local file storage
